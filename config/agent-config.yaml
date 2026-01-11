@@ -1,0 +1,52 @@
+# CACP Agent Configuration
+#
+# This file configures a CACP agent with ADP integration.
+# Copy this file and modify for your specific agent.
+
+agent:
+  # Agent ID in AID format (required for ADP registration)
+  aid: "aid://example.com/backend-agent@1.0.0"
+  name: "Backend API Agent"
+  description: "Python/FastAPI coding agent for backend development with CACP coordination"
+  owner:
+    name: "Example Corp"
+    site: "https://example.com"
+    contact: "agents@example.com"
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+# ADP (Agent Discovery Protocol) configuration
+adp:
+  # Metis Agentic Exchange URL
+  exchange_url: "https://agentic-exchange.metisos.co"
+  # Automatically register with ADP on startup
+  auto_register: true
+
+# CACP-specific configuration
+cacp:
+  # Repository this agent manages
+  repo: "backend-api"
+  # Agent role
+  role: "backend"
+  # Supported languages
+  languages:
+    - "python"
+    - "sql"
+  # Supported contract types
+  supported_contract_types:
+    - "api_endpoint"
+    - "event_schema"
+    - "data_model"
+    - "config_spec"
+    - "rpc_interface"
+  # Maximum concurrent projects
+  max_concurrent_projects: 5
+
+# Run mode: "development" or "production"
+# In production mode, ADP registration is required
+mode: "development"
+
+# Optional: Path to persist state
+# persist_path: "./data/state.json"
