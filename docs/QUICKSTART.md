@@ -8,6 +8,7 @@ Get two AI agents coordinating in 5 minutes.
 
 - Python 3.10+
 - Groq API key (for the demo)
+- Understanding of ADP (see [ADP Setup Guide](ADP_SETUP.md))
 
 ---
 
@@ -77,9 +78,37 @@ All 12 tests should pass.
 
 ---
 
-## Step 5: Start Your Own Agent
+## Step 5: Configure ADP (Required for Multi-Agent)
 
-### Option A: CLI Arguments
+CACP agents discover each other through **ADP (Agent Discovery Protocol)**. Skip this for local testing, but it's required for real coordination.
+
+### Get an Agent ID (AID)
+
+Create a unique identifier for your agent:
+```
+aid://your-domain.com/agent-name@version
+```
+
+Example: `aid://mycompany.com/backend-api@1.0.0`
+
+### Configure ADP Registration
+
+In your config file, set:
+```yaml
+adp:
+  exchange_url: "https://agentic-exchange.metisos.co"
+  auto_register: true  # Registers on startup
+```
+
+When you start the agent, it automatically registers with the Metis Agentic Exchange.
+
+See [ADP Setup Guide](ADP_SETUP.md) for complete details.
+
+---
+
+## Step 6: Start Your Own Agent
+
+### Option A: CLI Arguments (Local Testing)
 
 ```bash
 python -m src.main \
@@ -89,15 +118,17 @@ python -m src.main \
     --port 8080
 ```
 
-### Option B: Config File
+### Option B: Config File (Recommended)
 
 Create `config/my-agent.yaml`:
 ```yaml
 agent:
   aid: "aid://mycompany.com/backend-agent@1.0.0"
   name: "My Backend Agent"
+  description: "Python backend agent with CACP coordination"
 
 server:
+  host: "0.0.0.0"
   port: 8080
 
 adp:
@@ -108,6 +139,11 @@ cacp:
   repo: "my-backend"
   role: "backend"
   languages: ["python"]
+  supported_contract_types:
+    - "api_endpoint"
+    - "data_model"
+
+mode: "development"
 ```
 
 Run:
@@ -117,7 +153,7 @@ python -m src.main --config config/my-agent.yaml
 
 ---
 
-## Step 6: Connect Two Agents
+## Step 7: Connect Two Agents
 
 Terminal 1 (Backend):
 ```bash
@@ -129,7 +165,20 @@ Terminal 2 (Frontend):
 python -m src.main --repo frontend-app --role frontend --port 8081
 ```
 
-Register peers:
+### Option A: Discover via ADP (Production)
+
+If both agents registered with ADP, they can discover each other:
+
+```python
+from src.adp import ADPClient
+
+adp = ADPClient("https://agentic-exchange.metisos.co")
+frontends = await adp.search_cacp_agents(role="frontend")
+# Returns list of registered frontend agents with endpoints
+```
+
+### Option B: Manual Peer Registration (Local Testing)
+
 ```bash
 # Tell backend about frontend
 curl -X POST http://localhost:8080/peers/register \
@@ -144,7 +193,7 @@ curl -X POST http://localhost:8081/peers/register \
 
 ---
 
-## Step 7: Make Your First API Call
+## Step 8: Make Your First API Call
 
 Create a project:
 ```bash
@@ -182,6 +231,7 @@ Response:
 
 ## Next Steps
 
+- Read the [ADP Setup Guide](ADP_SETUP.md) for agent discovery configuration
 - Read the [Protocol Specification](PROTOCOL.md) for all methods
 - Read the [Agent Guide](AGENT_GUIDE.md) for AI agent usage
 - Check [examples/](../examples/) for more demos

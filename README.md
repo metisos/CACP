@@ -93,14 +93,67 @@ python -m src.main \
 python -m src.main --config config/agent-config.yaml --register-adp
 ```
 
+## ADP Setup (Required)
+
+CACP requires **ADP (Agent Discovery Protocol)** for agents to discover and coordinate with each other. Agents register with the **Metis Agentic Exchange** to be discoverable.
+
+### 1. Get an Agent ID
+
+Every agent needs a unique identifier:
+
+```
+aid://your-domain.com/agent-name@version
+```
+
+Example: `aid://mycompany.com/backend-api@1.0.0`
+
+### 2. Configure ADP in Your Agent
+
+```yaml
+# config/my-agent.yaml
+agent:
+  aid: "aid://your-domain.com/backend@1.0.0"
+  name: "My Backend Agent"
+
+adp:
+  exchange_url: "https://agentic-exchange.metisos.co"
+  auto_register: true  # Register on startup
+
+cacp:
+  repo: "backend-api"
+  role: "backend"
+  languages: ["python"]
+```
+
+### 3. Start with ADP Registration
+
+```bash
+python -m src.main --config config/my-agent.yaml
+# Agent automatically registers with Agentic Exchange
+```
+
+### 4. Discover Other Agents
+
+```python
+from src.adp import ADPClient
+
+adp = ADPClient("https://agentic-exchange.metisos.co")
+frontends = await adp.search_cacp_agents(role="frontend")
+
+for agent in frontends:
+    print(f"{agent.name}: {agent.endpoint}")
+```
+
+See **[ADP Setup Guide](docs/ADP_SETUP.md)** for complete instructions.
+
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
+| [ADP Setup Guide](docs/ADP_SETUP.md) | Configure agent discovery (required) |
 | [Quickstart](docs/QUICKSTART.md) | Get started in 5 minutes |
 | [Protocol Specification](docs/PROTOCOL.md) | Full protocol reference |
 | [Agent Guide](docs/AGENT_GUIDE.md) | For AI agents using CACP |
-| [Implementation Report](docs/IMPLEMENTATION_REPORT.md) | Architecture details |
 
 ## Protocol Overview
 

@@ -1,0 +1,26 @@
+version: 1
+
+staleness:
+  warning: 30
+  critical: 90
+
+track:
+  - "src/**/*.py"
+  - "tests/**/*.py"
+
+ignore:
+  - "*.pyc"
+  - "__pycache__/**"
+  - ".pytest_cache/**"
+  - "logs/**"
+
+modules:
+  handlers:
+    path: ".rosetta/modules/handlers.md"
+    load_when: "modifying JSON-RPC methods"
+  models:
+    path: ".rosetta/modules/models.md"
+    load_when: "working with data models"
+  transport:
+    path: ".rosetta/modules/transport.md"
+    load_when: "peer communication or sync"
